@@ -3,7 +3,6 @@
 > AI-powered guide that helps first-time Indian voters (18–22) understand registration, eligibility, polling day, and their rights — multilingual, voice-enabled, and grounded in official ECI guidelines.
 
 **Live demo:** https://starry-runner-494505-d9.web.app
-**Backend (Cloud Run):** https://election-assistant-backend-1037308612334.asia-south1.run.app
 **Submission:** Hack2Skill PromptWars 2026
 
 ---
@@ -161,75 +160,7 @@ election-assistant-india/
 
 ---
 
-## 6. Evaluation Focus Areas
-
-### 6.1 Code Quality
-- Modular split: per-service files on the backend (`gemini`, `translate`, `tts`, `geocode`); per-component files on the frontend.
-- All public service functions have JSDoc with `@param`, `@returns`, `@throws`.
-- ESLint configured at the root; React Hooks rules enforced.
-- No dead code, no commented-out blocks, no `console.log` debug noise.
-- See [backend/README.md](./backend/README.md) for endpoint table and env vars.
-
-### 6.2 Security
-See [SECURITY.md](./SECURITY.md) for the full threat model. Highlights:
-- **Helmet** for security headers (HSTS, X-Content-Type-Options, etc.); Firebase Hosting adds X-Frame-Options=DENY, Permissions-Policy, Referrer-Policy.
-- **CORS allowlist** — only the production Firebase domain is permitted (origins are trimmed before comparison).
-- **`trust proxy=1`** so rate limiting works correctly on Cloud Run.
-- **Per-IP rate limits** — chat 20/min (expensive), translate/TTS 40/min, geocode 30/min.
-- **Input sanitization** — control chars stripped, length capped at 1000, prompt-injection patterns neutralized.
-- **Output sanitization** — LLM replies have `<script>`, `<iframe>`, `javascript:`, and `on*=` attributes stripped.
-- **JSON body cap** — 1 MB; **request timeout** — 30 s.
-- **Generic error messages** to clients; full upstream Google API errors logged server-side only.
-- **No PII storage** — message content never persisted; assistant refuses to ask for Aadhaar/EPIC.
-- **Gemini safety filters** — `BLOCK_MEDIUM_AND_ABOVE` on harassment, hate, sexual, dangerous content.
-- **API keys** — set via Cloud Run env vars, never in code or browser; `.env*` and `.claude/` gitignored.
-
-### 6.3 Efficiency
-- **Cloud Run scale-to-zero** — costs $0 at idle.
-- **Gemini 2.5 Flash** — chosen for low latency and free-tier headroom.
-- **Lightweight RAG** — keyword scoring over 19 entries; no vector DB or embeddings overhead.
-- **Asset caching** — JS/CSS/SVG/images served from Firebase with `Cache-Control: public, max-age=31536000, immutable`.
-- **CORS preflight cached** for 24 h.
-- **Repo under 1 MB** (excluding `node_modules` / `.git`).
-
-### 6.4 Testing
-- **Backend (Vitest):** 18 tests across `sanitize.test.js` and `knowledge.test.js`.
-- **Frontend (Vitest + Testing Library):** 24 tests including the full eligibility-wizard decision tree.
-- **Manual smoke checklist:** [TESTING.md](./TESTING.md) — covers chat, wizard, booth lookup, accessibility, and security paths.
-
-```bash
-# from root
-npm test                    # frontend
-cd backend && npm test      # backend
-```
-
-### 6.5 Accessibility
-- **WCAG AA color contrast** throughout (placeholder text bumped from gray-400 → gray-500).
-- **Keyboard navigable** — every action reachable via Tab; Quick Action buttons have explicit focus styles.
-- **Skip-to-content** link as the first focusable element.
-- **ARIA** — `role="article"` and `aria-label` on chat bubbles; `aria-live="polite"` on the chat log; labelled icon buttons.
-- **`<label htmlFor>`** on the chat textarea (visually hidden via `.sr-only`).
-- **Focus indicators** — saffron 2px ring via `:focus-visible`.
-- **`prefers-reduced-motion`** respected.
-- **Multilingual** — English, Hindi, Marathi.
-- **Voice output** — TTS for non-readers and visually-impaired users.
-
-### 6.6 Google Services
-| Service | How we use it | Why we picked it |
-|---|---|---|
-| **Gemini 2.5 Flash** | Conversational AI core, with strict system prompt + KB grounding | Low latency, free-tier headroom |
-| **Cloud Run** | Hosts the Express backend (asia-south1) | Auto-scale, scale-to-zero, container-native |
-| **Firebase Hosting** | Hosts the React frontend | Global CDN, free SSL, instant rollback |
-| **Cloud Translation v2** | Hindi/Marathi support | India needs > English |
-| **Cloud Text-to-Speech** | Audio output in EN/HI/MR | Accessibility for low-literacy / VI users |
-| **Google Geocoding API** | Pincode → lat/lng for booth lookup | Real-world utility on polling day |
-| **Google Maps** | Final-mile booth search via deep link | Familiar UX, no extra map widget |
-
-Seven Google Cloud services, each with a clear, justified role.
-
----
-
-## 7. Run Locally
+## 6. Run Locally
 
 ### Prerequisites
 - Node.js 20+
@@ -254,7 +185,7 @@ npm run dev                      # http://localhost:5173
 
 ---
 
-## 8. Deploy
+## 7. Deploy
 
 Full walkthrough: [DEPLOY.md](./DEPLOY.md). TL;DR:
 
@@ -274,7 +205,7 @@ firebase deploy --only hosting
 
 ---
 
-## 9. Assumptions
+## 8. Assumptions
 
 - **Indian electoral context** — the assistant is designed for ECI rules; not for non-Indian elections.
 - **Knowledge base reflects ECI rules as of 2026-04-26** — should be re-curated before each election cycle.
@@ -285,7 +216,7 @@ firebase deploy --only hosting
 
 ---
 
-## 10. Sources & Credits
+## 9. Sources & Credits
 
 - Knowledge base curated from [Election Commission of India](https://eci.gov.in)
 - Voter portal: [voters.eci.gov.in](https://voters.eci.gov.in)
