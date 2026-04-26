@@ -1,0 +1,2 @@
+- [Project: Election Assistant India](project_election_assistant.md) — hackathon submission, Hack2Skill PromptWars; Vite/React frontend + Express/Gemini backend (Cloud Run); both have passing tests
+- [Feedback: hackathon-grade scope](feedback_hackathon_scope.md) — for this project, do not recommend large refactors, extracted hooks, typed props, or test additions; cleanup-only feedback preferred

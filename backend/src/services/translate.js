@@ -35,7 +35,8 @@ export async function translateText(text, targetLang) {
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Translate API error: ${res.status} ${err}`);
+    console.error(`Translate API ${res.status}:`, err);
+    throw new Error('Translate API error');
   }
 
   const data = await res.json();

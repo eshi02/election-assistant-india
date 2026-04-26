@@ -86,7 +86,6 @@ export default function ChatWindow({ lang = 'en' }) {
             className="flex-1 resize-none rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-saffron focus:border-transparent placeholder:text-gray-500"
             rows={2}
             maxLength={1000}
-            aria-describedby="chat-help"
             disabled={loading}
           />
           <button
@@ -98,9 +97,6 @@ export default function ChatWindow({ lang = 'en' }) {
             <Send size={20} />
           </button>
         </div>
-        <p id="chat-help" className="text-xs text-gray-500 mt-2">
-          Press Enter to send · Shift+Enter for new line
-        </p>
       </div>
     </div>
   );

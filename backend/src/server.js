@@ -12,6 +12,11 @@ import { geocodePincode } from './services/geocode.js';
 const app = express();
 const PORT = process.env.PORT || 8080;
 
+// Cloud Run sits behind exactly one proxy — required for express-rate-limit
+// to read the real client IP from X-Forwarded-For instead of keying every
+// request to the load-balancer IP.
+app.set('trust proxy', 1);
+
 // Security headers
 app.use(helmet());
 
@@ -20,7 +25,7 @@ app.use(express.json({ limit: '1mb' }));
 
 // CORS — in prod we'll restrict to the Firebase domain
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
+  ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
   : ['http://localhost:5173'];
 
 app.use(cors({
@@ -111,7 +116,7 @@ app.post('/api/translate', utilityLimiter, async (req, res) => {
     res.json({ translated });
   } catch (err) {
     console.error('Translate error:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Translation failed' });
   }
 });
 
@@ -125,7 +130,7 @@ app.post('/api/tts', utilityLimiter, async (req, res) => {
     res.json({ audioContent }); // base64 MP3
   } catch (err) {
     console.error('TTS error:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Speech synthesis failed' });
   }
 });
 
@@ -138,10 +143,10 @@ app.post('/api/geocode', geocodeLimiter, async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error('Geocode error:', err);
-    res.status(400).json({ error: err.message });
+    res.status(400).json({ error: 'Geocoding failed' });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`✅ Election Assistant backend on http://localhost:${PORT}`);
+  console.log(`Election Assistant backend listening on port ${PORT}`);
 });

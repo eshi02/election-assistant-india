@@ -49,16 +49,3 @@ export function sanitizeOutput(text) {
     .replace(/on\w+\s*=/gi, ''); // strip onclick=, onerror=, etc.
 }
 
-export function isLikelyOffTopic(text) {
-  // very loose heuristic — Gemini's system prompt is the real defense
-  const indianElectionTerms = [
-    'vote', 'voter', 'voting', 'election', 'eci', 'epic',
-    'polling', 'booth', 'ballot', 'evm', 'vvpat', 'register',
-    'eligible', 'constituency', 'lok sabha', 'assembly', 'aadhaar',
-    'india', 'indian', 'first time', 'nri', 'form 6', 'nota',
-    'candidate', 'mla', 'mp', 'panchayat', 'parliament',
-  ];
-  const lower = text.toLowerCase();
-  const hasAny = indianElectionTerms.some(t => lower.includes(t));
-  return !hasAny && text.length > 30;
-}

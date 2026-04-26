@@ -25,5 +25,3 @@ export default function LanguageSwitch({ value, onChange }) {
     </div>
   );
 }
-
-export { LANGS };

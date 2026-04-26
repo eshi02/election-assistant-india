@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { sanitizeInput, sanitizeOutput, isLikelyOffTopic } from './sanitize.js';
+import { sanitizeInput, sanitizeOutput } from './sanitize.js';
 
 describe('sanitizeInput', () => {
   it('returns empty string for non-string input', () => {
@@ -60,17 +60,3 @@ describe('sanitizeOutput', () => {
   });
 });
 
-describe('isLikelyOffTopic', () => {
-  it('detects on-topic queries', () => {
-    expect(isLikelyOffTopic('How do I register to vote?')).toBe(false);
-    expect(isLikelyOffTopic('What is EVM?')).toBe(false);
-  });
-
-  it('flags clearly off-topic long queries', () => {
-    expect(isLikelyOffTopic('Tell me a long story about dragons and knights please')).toBe(true);
-  });
-
-  it('does not flag short ambiguous queries', () => {
-    expect(isLikelyOffTopic('hi')).toBe(false);
-  });
-});

@@ -45,7 +45,8 @@ export async function synthesizeSpeech(text, lang = 'en') {
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`TTS API error: ${res.status} ${err}`);
+    console.error(`TTS API ${res.status}:`, err);
+    throw new Error('TTS API error');
   }
 
   const data = await res.json();
