@@ -8,6 +8,14 @@ const ENDPOINT = 'https://translation.googleapis.com/language/translate/v2';
 
 const SUPPORTED = ['en', 'hi', 'mr']; // English, Hindi, Marathi
 
+/**
+ * Translate text into a supported target language using Google Cloud Translation v2.
+ *
+ * @param {string} text - The source text (assumed to be in English)
+ * @param {'en'|'hi'|'mr'} targetLang - Target language code (en is a no-op)
+ * @returns {Promise<string>} Translated text
+ * @throws {Error} If GCP_API_KEY is missing, language unsupported, or API call fails
+ */
 export async function translateText(text, targetLang) {
   if (!API_KEY) throw new Error('GCP_API_KEY not set');
   if (!SUPPORTED.includes(targetLang)) {

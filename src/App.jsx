@@ -12,6 +12,12 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-blue-50">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-navy focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:z-50"
+      >
+        Skip to main content
+      </a>
       <header className="bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -38,7 +44,7 @@ function App() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-8">
+      <main id="main-content" className="max-w-3xl mx-auto px-4 py-8">
         <QuickActions onAction={setActiveView} />
 
         {activeView === 'chat' && <ChatWindow lang={lang} />}

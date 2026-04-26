@@ -14,6 +14,16 @@ async function loadKB() {
   return cachedKB;
 }
 
+/**
+ * Retrieve the top-N most relevant entries from the ECI knowledge base for a query.
+ *
+ * Uses a simple keyword-overlap score: keyword match (5pts), title word match (2pts),
+ * content word match (1pt). Entries with score 0 are filtered out.
+ *
+ * @param {string} query - User question (free text)
+ * @param {number} [topN=4] - Maximum number of entries to return
+ * @returns {Promise<Array<{id: string, title: string, content: string, keywords: string[]}>>}
+ */
 export async function findRelevantEntries(query, topN = 4) {
   if (!query || typeof query !== 'string') return [];
   const kb = await loadKB();
@@ -44,6 +54,13 @@ export async function findRelevantEntries(query, topN = 4) {
     .map(s => s.entry);
 }
 
+/**
+ * Render an array of knowledge entries into a single context block for the LLM,
+ * with each entry separated by a `---` divider and tagged with its source id.
+ *
+ * @param {Array<{id: string, title: string, content: string}>} entries
+ * @returns {string} Formatted context (empty string if no entries)
+ */
 export function formatAsContext(entries) {
   if (!entries.length) return '';
   return entries
@@ -51,6 +68,12 @@ export function formatAsContext(entries) {
     .join('\n\n---\n\n');
 }
 
+/**
+ * Return the metadata block from the ECI knowledge base
+ * (source attribution, last-updated date, etc.).
+ *
+ * @returns {Promise<{ source: string, lastUpdated: string }>}
+ */
 export async function getMetadata() {
   const kb = await loadKB();
   return kb.metadata;

@@ -28,7 +28,11 @@ export default function MessageBubble({ msg, lang = 'en' }) {
   if (msg.role === 'user') {
     return (
       <div className="flex gap-3 justify-end">
-        <div className="max-w-[75%] rounded-2xl px-4 py-3 bg-navy text-white">
+        <div
+          className="max-w-[75%] rounded-2xl px-4 py-3 bg-navy text-white"
+          role="article"
+          aria-label="Your message"
+        >
           <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
         </div>
         <div className="bg-gray-300 text-gray-700 p-2 rounded-full h-9 w-9 flex items-center justify-center flex-shrink-0">
@@ -47,6 +51,8 @@ export default function MessageBubble({ msg, lang = 'en' }) {
         className={`max-w-[75%] rounded-2xl px-4 py-3 ${
           msg.error ? 'bg-red-50 border border-red-200 text-red-900' : 'bg-gray-100 text-ink'
         }`}
+        role="article"
+        aria-label="Assistant response"
       >
         <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
 

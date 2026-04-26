@@ -35,6 +35,20 @@ export function sanitizeInput(text) {
   return cleaned.trim();
 }
 
+/**
+ * Strip anything that looks like injected HTML/script tags from LLM output.
+ * Defense-in-depth: even though we render as text, never trust.
+ */
+export function sanitizeOutput(text) {
+  if (typeof text !== 'string') return '';
+  return text
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<iframe[\s\S]*?<\/iframe>/gi, '')
+    .replace(/javascript:/gi, '')
+    .replace(/on\w+\s*=/gi, ''); // strip onclick=, onerror=, etc.
+}
+
 export function isLikelyOffTopic(text) {
   // very loose heuristic — Gemini's system prompt is the real defense
   const indianElectionTerms = [

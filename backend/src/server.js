@@ -15,6 +15,9 @@ const PORT = process.env.PORT || 8080;
 // Security headers
 app.use(helmet());
 
+// Parse JSON request bodies (1 MB limit)
+app.use(express.json({ limit: '1mb' }));
+
 // CORS — in prod we'll restrict to the Firebase domain
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',')
@@ -22,21 +25,48 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // allow same-origin / curl
+    // Allow same-origin requests and tools like curl (no origin header)
+    if (!origin) return cb(null, true);
     if (allowedOrigins.includes(origin)) return cb(null, true);
-    cb(new Error(`CORS: origin ${origin} not allowed`));
+    // Don't throw — return false so CORS just blocks instead of crashing
+    cb(null, false);
   },
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+  maxAge: 86400, // cache preflight 24h
 }));
 
-app.use(express.json({ limit: '10kb' }));
-
-// Rate limit: 20 requests / minute per IP
+// Global request timeout — protects against slow-loris attacks
+app.use((req, res, next) => {
+  req.setTimeout(30000, () => {
+    res.status(408).json({ error: 'Request timeout' });
+  });
+  next();
+});
+// Chat: 20/min (expensive — calls Gemini)
 const chatLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 20,
   standardHeaders: true,
   legacyHeaders: false,
+  message: { error: 'Too many chat requests. Please slow down.' },
+});
+
+// Translate/TTS: 40/min (cheaper)
+const utilityLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 40,
+  standardHeaders: true,
+  legacyHeaders: false,
   message: { error: 'Too many requests. Please slow down.' },
+});
+
+// Geocode: 30/min
+const geocodeLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
 // Health check (Cloud Run pings this)
@@ -70,7 +100,7 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
 });
 
 // Translation endpoint
-app.post('/api/translate', chatLimiter, async (req, res) => {
+app.post('/api/translate', utilityLimiter, async (req, res) => {
   try {
     const { text, targetLang } = req.body;
     if (!text || !targetLang) {
@@ -86,7 +116,7 @@ app.post('/api/translate', chatLimiter, async (req, res) => {
 });
 
 // Text-to-Speech endpoint
-app.post('/api/tts', chatLimiter, async (req, res) => {
+app.post('/api/tts', utilityLimiter, async (req, res) => {
   try {
     const { text, lang } = req.body;
     if (!text) return res.status(400).json({ error: 'text required' });
@@ -100,7 +130,7 @@ app.post('/api/tts', chatLimiter, async (req, res) => {
 });
 
 // Geocoding endpoint (pincode → lat/lng)
-app.post('/api/geocode', chatLimiter, async (req, res) => {
+app.post('/api/geocode', geocodeLimiter, async (req, res) => {
   try {
     const { pincode } = req.body;
     if (!pincode) return res.status(400).json({ error: 'pincode required' });

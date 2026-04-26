@@ -128,6 +128,12 @@ export default function EligibilityWizard({ onClose }) {
     const newAnswers = { ...answers, [questionId]: value };
     setAnswers(newAnswers);
 
+    // Short-circuit on hard disqualifiers — no point asking more questions
+    if (questionId === 'citizenship' && (value === 'no' || value === 'oci')) {
+      setResult(evaluateAnswers(newAnswers));
+      return;
+    }
+
     if (step < QUESTIONS.length - 1) {
       setStep(step + 1);
     } else {

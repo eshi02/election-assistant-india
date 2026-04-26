@@ -13,7 +13,7 @@ export default function QuickActions({ onAction }) {
         <button
           key={id}
           onClick={() => onAction(id)}
-          className="flex items-center gap-2 bg-white border border-gray-200 hover:border-saffron hover:bg-orange-50 px-4 py-2 rounded-full text-sm font-medium text-ink transition-colors shadow-sm"
+          className="flex items-center gap-2 bg-white border border-gray-200 hover:border-saffron hover:bg-orange-50 focus:border-saffron focus:bg-orange-50 px-4 py-2 rounded-full text-sm font-medium text-ink transition-colors shadow-sm"
         >
           <Icon size={16} />
           {label}

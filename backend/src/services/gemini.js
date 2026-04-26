@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { findRelevantEntries, formatAsContext } from '../data/knowledge.js';
+import { sanitizeOutput } from '../utils/sanitize.js';
 
 const apiKey = process.env.GEMINI_API_KEY;
 if (!apiKey) {
@@ -30,6 +31,16 @@ Friendly, encouraging, like a knowledgeable older sibling. Use emojis sparingly 
 OUTPUT FORMAT
 Plain text, optionally with markdown bullets/bold for clarity. No headers above level 3. No code blocks unless showing a portal URL.`;
 
+/**
+ * Generate a grounded answer to a user's election-related question.
+ *
+ * Pipeline: retrieve relevant ECI entries → format as context →
+ * call Gemini with system prompt + context → sanitize output.
+ *
+ * @param {string} userMessage - The user's question (already sanitized)
+ * @returns {Promise<{ answer: string, sources: Array<{id: string, title: string}> }>}
+ * @throws {Error} If Gemini API call fails or returns no text
+ */
 export async function generateAnswer(userMessage) {
   const relevantEntries = await findRelevantEntries(userMessage, 4);
   const contextBlock = formatAsContext(relevantEntries);
@@ -55,10 +66,10 @@ export async function generateAnswer(userMessage) {
     : `USER QUESTION: ${userMessage}\n\n(No specific ECI context found for this query — suggest the user check voters.eci.gov.in or call 1950 if you cannot answer confidently.)`;
 
   const result = await model.generateContent(prompt);
-  const text = result.response.text();
+  const rawText = result.response.text();
 
   return {
-    answer: text,
+    answer: sanitizeOutput(rawText),
     sources: relevantEntries.map(e => ({ id: e.id, title: e.title })),
   };
 }

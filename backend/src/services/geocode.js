@@ -6,6 +6,14 @@
 const API_KEY = process.env.GCP_API_KEY;
 const ENDPOINT = 'https://maps.googleapis.com/maps/api/geocode/json';
 
+/**
+ * Resolve an Indian 6-digit pincode to coordinates and a formatted address
+ * using the Google Geocoding API (results biased to country:IN).
+ *
+ * @param {string} pincode - 6-digit Indian PIN code
+ * @returns {Promise<{ pincode: string, formattedAddress: string, location: { lat: number, lng: number }, components: Array<object> }>}
+ * @throws {Error} If pincode is malformed, GCP_API_KEY is missing, or no results found
+ */
 export async function geocodePincode(pincode) {
   if (!API_KEY) throw new Error('GCP_API_KEY not set');
   if (!/^\d{6}$/.test(pincode)) {

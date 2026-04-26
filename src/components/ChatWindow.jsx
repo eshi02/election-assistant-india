@@ -76,15 +76,17 @@ export default function ChatWindow({ lang = 'en' }) {
 
       <div className="border-t border-gray-200 p-4">
         <div className="flex gap-2">
+          <label htmlFor="chat-input" className="sr-only">Type your election-related question</label>
           <textarea
+            id="chat-input"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Ask about voter registration, polling day, EVM..."
-            className="flex-1 resize-none rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-saffron focus:border-transparent"
+            className="flex-1 resize-none rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-saffron focus:border-transparent placeholder:text-gray-500"
             rows={2}
             maxLength={1000}
-            aria-label="Type your question"
+            aria-describedby="chat-help"
             disabled={loading}
           />
           <button
@@ -96,7 +98,7 @@ export default function ChatWindow({ lang = 'en' }) {
             <Send size={20} />
           </button>
         </div>
-        <p className="text-xs text-gray-400 mt-2">
+        <p id="chat-help" className="text-xs text-gray-500 mt-2">
           Press Enter to send · Shift+Enter for new line
         </p>
       </div>

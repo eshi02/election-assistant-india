@@ -12,6 +12,16 @@ const VOICE_BY_LANG = {
   mr: { languageCode: 'mr-IN', name: 'mr-IN-Standard-A' },
 };
 
+/**
+ * Synthesize speech from text using Google Cloud Text-to-Speech.
+ *
+ * Strips markdown punctuation so it isn't read aloud, and caps input at 5000 chars.
+ *
+ * @param {string} text - Text to speak
+ * @param {'en'|'hi'|'mr'} [lang='en'] - Voice language (defaults to en-IN if unrecognized)
+ * @returns {Promise<string>} Base64-encoded MP3 audio
+ * @throws {Error} If GCP_API_KEY is missing or TTS API call fails
+ */
 export async function synthesizeSpeech(text, lang = 'en') {
   if (!API_KEY) throw new Error('GCP_API_KEY not set');
 
