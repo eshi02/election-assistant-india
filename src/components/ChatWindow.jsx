@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Bot, User, Loader2 } from 'lucide-react';
+import { Send, Bot, Loader2 } from 'lucide-react';
 import { sendChatMessage } from '../services/gemini';
+import { translate } from '../services/translate';
+import MessageBubble from './MessageBubble';
 
-export default function ChatWindow() {
+export default function ChatWindow({ lang = 'en' }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -21,17 +23,19 @@ export default function ChatWindow() {
     const trimmed = input.trim();
     if (!trimmed || loading) return;
 
-    const userMsg = { role: 'user', content: trimmed };
-    setMessages(prev => [...prev, userMsg]);
+    setMessages(prev => [...prev, { role: 'user', content: trimmed }]);
     setInput('');
     setLoading(true);
 
     try {
-      const { answer, sources } = await sendChatMessage(trimmed);
-      setMessages(prev => [
-        ...prev,
-        { role: 'assistant', content: answer, sources },
-      ]);
+      // Translate user input to English if needed
+      const englishQuery = lang === 'en' ? trimmed : await translate(trimmed, 'en');
+      const { answer, sources } = await sendChatMessage(englishQuery);
+
+      // Translate response back to user's language
+      const finalAnswer = lang === 'en' ? answer : await translate(answer, lang);
+
+      setMessages(prev => [...prev, { role: 'assistant', content: finalAnswer, sources }]);
     } catch (err) {
       setMessages(prev => [
         ...prev,
@@ -51,40 +55,9 @@ export default function ChatWindow() {
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border border-gray-200 flex flex-col h-[600px]">
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-6 space-y-4" role="log" aria-live="polite">
         {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            {msg.role === 'assistant' && (
-              <div className="bg-saffron text-white p-2 rounded-full h-9 w-9 flex items-center justify-center flex-shrink-0">
-                <Bot size={18} />
-              </div>
-            )}
-            <div
-              className={`max-w-[75%] rounded-2xl px-4 py-3 ${
-                msg.role === 'user'
-                  ? 'bg-navy text-white'
-                  : msg.error
-                  ? 'bg-red-50 border border-red-200 text-red-900'
-                  : 'bg-gray-100 text-ink'
-              }`}
-            >
-              <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
-              {msg.sources?.length > 0 && (
-                <div className="mt-2 pt-2 border-t border-gray-200 text-xs text-gray-500">
-                  Sources: {msg.sources.map(s => s.id).join(', ')}
-                </div>
-              )}
-            </div>
-            {msg.role === 'user' && (
-              <div className="bg-gray-300 text-gray-700 p-2 rounded-full h-9 w-9 flex items-center justify-center flex-shrink-0">
-                <User size={18} />
-              </div>
-            )}
-          </div>
+          <MessageBubble key={i} msg={msg} lang={lang} />
         ))}
 
         {loading && (
@@ -101,7 +74,6 @@ export default function ChatWindow() {
         <div ref={endRef} />
       </div>
 
-      {/* Input */}
       <div className="border-t border-gray-200 p-4">
         <div className="flex gap-2">
           <textarea

@@ -5,6 +5,9 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import { generateAnswer } from './services/gemini.js';
 import { sanitizeInput } from './utils/sanitize.js';
+import { translateText } from './services/translate.js';
+import { synthesizeSpeech } from './services/tts.js';
+import { geocodePincode } from './services/geocode.js';
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -63,6 +66,49 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
       error: 'Something went wrong. Please try again.',
       details: process.env.NODE_ENV === 'development' ? err.message : undefined,
     });
+  }
+});
+
+// Translation endpoint
+app.post('/api/translate', chatLimiter, async (req, res) => {
+  try {
+    const { text, targetLang } = req.body;
+    if (!text || !targetLang) {
+      return res.status(400).json({ error: 'text and targetLang required' });
+    }
+    const sanitized = sanitizeInput(text);
+    const translated = await translateText(sanitized, targetLang);
+    res.json({ translated });
+  } catch (err) {
+    console.error('Translate error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Text-to-Speech endpoint
+app.post('/api/tts', chatLimiter, async (req, res) => {
+  try {
+    const { text, lang } = req.body;
+    if (!text) return res.status(400).json({ error: 'text required' });
+    const sanitized = sanitizeInput(text);
+    const audioContent = await synthesizeSpeech(sanitized, lang || 'en');
+    res.json({ audioContent }); // base64 MP3
+  } catch (err) {
+    console.error('TTS error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Geocoding endpoint (pincode → lat/lng)
+app.post('/api/geocode', chatLimiter, async (req, res) => {
+  try {
+    const { pincode } = req.body;
+    if (!pincode) return res.status(400).json({ error: 'pincode required' });
+    const result = await geocodePincode(pincode);
+    res.json(result);
+  } catch (err) {
+    console.error('Geocode error:', err);
+    res.status(400).json({ error: err.message });
   }
 });
 
