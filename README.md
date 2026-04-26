@@ -23,7 +23,7 @@ This assistant solves all three with conversational AI, multilingual support, vo
 
 ### Why a knowledge base, not pure LLM?
 
-Gemini's training data has Indian election information, but it can be outdated, conflate Indian rules with other countries', and confidently hallucinate form numbers and deadlines. We solved this with a **curated JSON knowledge base of 19 ECI-verified entries** plus lightweight RAG-style retrieval.
+Gemini's training data has Indian election information, but it can be outdated, conflate Indian rules with other countries', and confidently hallucinate form numbers and deadlines. We solved this with a **curated JSON knowledge base of 28 ECI-verified entries** (18 procedural + 10 myth-busting) plus lightweight RAG-style retrieval.
 
 ### Why a strict system prompt?
 
@@ -48,7 +48,7 @@ React frontend (Firebase Hosting)
 Express backend (Cloud Run)
      ↓
 1. Sanitize input    → reject control chars, neutralize prompt-injection patterns
-2. Retrieve top-N    → keyword-score 19 ECI entries, pick top 4
+2. Retrieve top-N    → keyword-score 28 ECI entries, pick top 4
 3. Build prompt      → system rules + retrieved context + user question
 4. Call Gemini 2.5 Flash with safety filters set to BLOCK_MEDIUM_AND_ABOVE
 5. Sanitize output   → strip <script>, on*=, javascript: from LLM response
@@ -60,8 +60,10 @@ Render bubble + Listen button (TTS) in user's chosen language
 
 | Feature | What it does | How |
 |---|---|---|
-| Conversational chat | Grounded answers about the Indian election process | Gemini 2.5 Flash + lightweight RAG over 19 ECI entries |
+| Conversational chat | Grounded answers about the Indian election process | Gemini 2.5 Flash + lightweight RAG over 28 ECI entries |
 | Eligibility Wizard | 4-question decision tree → personalized result + next steps | Pure-React state machine; short-circuits on hard disqualifiers |
+| Migration Helper | 5-question wizard for movers (students, migrant workers) → Form 6 / Form 8 / NRI / postal-ballot path + chat handoff | Pure-React decision tree; deep-links to chat with a pre-filled question |
+| Forwarded-message Fact-Checker | Paste a WhatsApp claim about Indian elections → verdict (true / misleading / false / unverifiable) + ECI citations | Gemini 2.5 Flash with strict JSON output prompt + RAG over 10 misinformation KB entries; refuses claims about specific candidates/parties |
 | Polling Booth Lookup | Pincode → coordinates → Google Maps polling-booth search | Server-side Google Geocoding API |
 | Voice output (TTS) | Reads any chat reply aloud in EN/HI/MR | Google Cloud Text-to-Speech REST |
 | Multilingual UI | Translates user input to English, response back to user's language | Google Cloud Translation v2 |
@@ -97,7 +99,7 @@ Render bubble + Listen button (TTS) in user's chosen language
 
 ### Design choices
 
-- **Lightweight RAG** — keyword scoring over 19 entries, no vector DB. Repo stays under 1 MB; retrieval latency is sub-millisecond.
+- **Lightweight RAG** — keyword scoring over 28 entries, no vector DB. Repo stays under 1 MB; retrieval latency is sub-millisecond.
 - **Stateless backend** — Cloud Run scales to zero, costs $0 at idle.
 - **API keys never reach the browser** — all Google service calls are proxied through the backend.
 - **`trust proxy` is set to 1** so `express-rate-limit` reads the real client IP from `X-Forwarded-For` (Cloud Run is one proxy hop). Without this, rate limiting would key everyone to the load balancer.
@@ -116,11 +118,14 @@ election-assistant-india/
 │   │   ├── ChatWindow.jsx
 │   │   ├── MessageBubble.jsx
 │   │   ├── EligibilityWizard.jsx     + .test.jsx
+│   │   ├── MigrationHelper.jsx       + .test.jsx
+│   │   ├── FactChecker.jsx           + .test.jsx
 │   │   ├── BoothLookup.jsx
 │   │   ├── QuickActions.jsx
 │   │   └── LanguageSwitch.jsx
 │   ├── services/               # Browser API clients (no API keys here)
 │   │   ├── gemini.js           # POST /api/chat
+│   │   ├── factcheck.js        # POST /api/factcheck
 │   │   ├── translate.js        # POST /api/translate
 │   │   ├── tts.js              # POST /api/tts
 │   │   └── maps.js             # builds Google Maps search URL
@@ -128,14 +133,14 @@ election-assistant-india/
 ├── backend/                    # Cloud Run service
 │   ├── Dockerfile              # Node 20-slim, non-root user
 │   ├── src/
-│   │   ├── server.js           # Express app + middleware + 4 endpoints
+│   │   ├── server.js           # Express app + middleware + 5 endpoints
 │   │   ├── services/
-│   │   │   ├── gemini.js       # Gemini 2.5 Flash + safety + RAG
+│   │   │   ├── gemini.js       # Gemini 2.5 Flash chat + fact-check + safety + RAG (+ .test.js)
 │   │   │   ├── translate.js    # Cloud Translation v2 wrapper
 │   │   │   ├── tts.js          # Cloud Text-to-Speech wrapper
 │   │   │   └── geocode.js      # Geocoding API wrapper
 │   │   ├── data/
-│   │   │   ├── eci-knowledge.json    # 19 curated ECI entries
+│   │   │   ├── eci-knowledge.json    # 28 curated ECI entries (18 procedural + 10 misinformation)
 │   │   │   └── knowledge.js          # retriever + .test.js
 │   │   └── utils/
 │   │       └── sanitize.js     # input + output sanitizers + .test.js

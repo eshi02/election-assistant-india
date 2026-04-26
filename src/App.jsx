@@ -3,12 +3,21 @@ import { Vote, Github } from 'lucide-react';
 import ChatWindow from './components/ChatWindow';
 import EligibilityWizard from './components/EligibilityWizard';
 import BoothLookup from './components/BoothLookup';
+import FactChecker from './components/FactChecker';
+import MigrationHelper from './components/MigrationHelper';
 import QuickActions from './components/QuickActions';
 import LanguageSwitch from './components/LanguageSwitch';
 
 function App() {
-  const [activeView, setActiveView] = useState('chat'); // 'chat' | 'eligibility' | 'booth'
+  // 'chat' | 'eligibility' | 'booth' | 'factcheck' | 'migration'
+  const [activeView, setActiveView] = useState('chat');
   const [lang, setLang] = useState('en');
+  const [prefilledMessage, setPrefilledMessage] = useState(null);
+
+  const handleAskChat = (msg) => {
+    setPrefilledMessage(msg);
+    setActiveView('chat');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 to-blue-50">
@@ -47,12 +56,27 @@ function App() {
       <main id="main-content" className="max-w-3xl mx-auto px-4 py-8">
         <QuickActions onAction={setActiveView} />
 
-        {activeView === 'chat' && <ChatWindow lang={lang} />}
+        {activeView === 'chat' && (
+          <ChatWindow
+            lang={lang}
+            prefilled={prefilledMessage}
+            onPrefillConsumed={() => setPrefilledMessage(null)}
+          />
+        )}
         {activeView === 'eligibility' && (
           <EligibilityWizard onClose={() => setActiveView('chat')} />
         )}
         {activeView === 'booth' && (
           <BoothLookup onClose={() => setActiveView('chat')} />
+        )}
+        {activeView === 'factcheck' && (
+          <FactChecker lang={lang} onClose={() => setActiveView('chat')} />
+        )}
+        {activeView === 'migration' && (
+          <MigrationHelper
+            onClose={() => setActiveView('chat')}
+            onAskChat={handleAskChat}
+          />
         )}
       </main>
 

@@ -131,6 +131,76 @@
       "title": "Your rights as a voter",
       "content": "As a registered voter you have the right to: (1) Vote freely without coercion. (2) A secret ballot. (3) Information about candidates' criminal antecedents, assets, and education (mandatory affidavit on ECI website). (4) Vote-by-mail if you qualify (see absentee voting). (5) Demand assistance at the booth if you're a PwD voter. (6) Lodge complaints via cVIGIL or 1950. (7) Use NOTA. (8) Verify your VVPAT slip. Employers must legally grant a paid holiday on polling day under Section 135B of the RP Act.",
       "keywords": ["rights", "voter rights", "holiday", "paid leave", "pwd", "disability"]
+    },
+    {
+      "id": "misinformation-evm-hacking",
+      "category": "misinformation",
+      "title": "Myth: EVMs can be hacked remotely",
+      "content": "EVMs used in Indian elections are standalone devices — they have no internet, Bluetooth, Wi-Fi, or any wireless connectivity, so they cannot be 'hacked from outside' as claimed in many forwarded messages. The Control Unit and Ballot Unit run on one-time programmable chips that cannot be reflashed. ECI has held open challenges inviting anyone to demonstrate tampering on actual EVMs; no successful tampering has been demonstrated. The Supreme Court has repeatedly examined and dismissed petitions seeking a return to paper ballots based on these claims.",
+      "keywords": ["evm hack", "evm hacked", "machine tampered", "rigging", "remote", "wifi", "internet", "bluetooth", "myth"]
+    },
+    {
+      "id": "misinformation-vvpat-tampering",
+      "category": "misinformation",
+      "title": "Myth: VVPAT slips don't match the EVM count",
+      "content": "VVPAT (Voter Verifiable Paper Audit Trail) slips are physically tallied against EVM totals in 5 randomly-selected polling stations per assembly segment after counting. ECI publishes the cross-verification results. Across hundreds of thousands of VVPAT-EVM matches conducted since 2019, the mismatch rate has been effectively zero — the rare discrepancies that have occurred were traced to procedural errors (wrong booth slip, machine reset) and not tampering. Forwards claiming 'mass mismatches' typically misrepresent these procedural notes.",
+      "keywords": ["vvpat", "mismatch", "paper trail", "count difference", "discrepancy", "myth"]
+    },
+    {
+      "id": "misinformation-voter-list-deletion",
+      "category": "misinformation",
+      "title": "Myth: Voter names are being secretly deleted to manipulate elections",
+      "content": "Voter rolls are revised through a transparent, publicly-auditable process. Names can only be removed via Form 7 objections, which require BLO field verification and notice to the affected voter. Draft and final electoral rolls are published on voters.eci.gov.in for public inspection during every revision. If your name is missing, you can re-register via Form 6 (free, online) and check your status anytime at the portal. Most cases of 'missing names' in viral messages are people who moved without transferring registration, or who never re-registered after the periodic revision.",
+      "keywords": ["voter list", "name deleted", "removed from roll", "missing name", "scrub", "manipulation", "myth"]
+    },
+    {
+      "id": "misinformation-aadhaar-mandatory",
+      "category": "misinformation",
+      "title": "Myth: You must show Aadhaar to vote",
+      "content": "Aadhaar is just one of 13 photo IDs ECI accepts at the polling booth — it is NOT mandatory. Other accepted IDs include EPIC voter card, passport, driving licence, PAN card, government service ID, bank/post office passbook with photo, MGNREGA job card, pension document, and health insurance smart card. The only requirement is that your name appears on the electoral roll for that booth. No polling officer can legally turn you away for not carrying Aadhaar specifically.",
+      "keywords": ["aadhaar mandatory", "aadhaar required", "must show aadhaar", "id required", "myth"]
+    },
+    {
+      "id": "misinformation-epic-mandatory",
+      "category": "misinformation",
+      "title": "Myth: Lost EPIC card means you cannot vote",
+      "content": "You do NOT need a physical EPIC voter card to vote — any of the 13 alternative photo IDs accepted by ECI (Aadhaar, passport, driving licence, PAN, etc.) will work, provided your name is on the electoral roll for that polling booth. You can also download a digital e-EPIC from voters.eci.gov.in any time and use it on your phone or printed out. Forwards claiming you'll be turned away without the physical card are wrong.",
+      "keywords": ["lost epic", "no voter card", "epic mandatory", "physical card", "e-epic", "myth"]
+    },
+    {
+      "id": "misinformation-vote-anywhere",
+      "category": "misinformation",
+      "title": "Myth: With Aadhaar, you can vote at any booth in India",
+      "content": "This is false. You can only vote at the specific polling booth where your name is on the electoral roll, and only in the constituency where you are registered. Aadhaar does not unlock voting at any other location. If you have moved cities, you must transfer your registration via Form 8 (or use Form 6 to register fresh at the new address) before you can vote there — there is no same-day workaround.",
+      "keywords": ["vote anywhere", "any booth", "aadhaar voting", "moved city", "wrong booth", "myth"]
+    },
+    {
+      "id": "misinformation-postal-fraud",
+      "category": "misinformation",
+      "title": "Myth: Postal ballots are easy to forge and decide elections",
+      "content": "Postal ballots are tightly regulated. They are only available to defined categories — service voters (armed forces, paramilitary), election-duty staff, voters above 80, persons with 40%+ disability, and certain essential-service workers — and each ballot is verified against signatures and declaration forms before being counted. Postal ballots usually account for under 1% of total votes cast in most constituencies. Forwards claiming postal ballots are 'rigged in bulk' typically misuse anecdotal incidents that were caught and addressed through the existing audit process.",
+      "keywords": ["postal ballot fraud", "postal forge", "postal vote rigged", "ballot fake", "myth"]
+    },
+    {
+      "id": "misinformation-bogus-voting",
+      "category": "misinformation",
+      "title": "Myth: Bogus or duplicate voting is rampant",
+      "content": "Multiple safeguards make repeat voting extremely difficult: indelible ink on the left index finger lasts roughly two weeks; the polling officer cross-checks the EPIC or photo ID against the electoral roll; and impersonation is a criminal offence under Section 171F of the Indian Penal Code with up to one year in prison. Most viral 'bogus voting' clips show staged, easily-spotted attempts that polling officers actually catch. Cases that occur are addressed via re-polls in affected booths.",
+      "keywords": ["bogus voting", "duplicate vote", "fake voter", "impersonation", "indelible ink", "myth"]
+    },
+    {
+      "id": "misinformation-nota-repoll",
+      "category": "misinformation",
+      "title": "Myth: If NOTA gets the most votes, the election is re-held",
+      "content": "Under current rules, NOTA does NOT trigger a re-election even if it tops the count. The candidate who receives the highest number of valid votes still wins the seat. NOTA's purpose is to let voters formally reject all candidates while preserving the secrecy of the ballot — but it has no binding effect on the outcome. Some states (e.g., Maharashtra for local body polls) have experimented with treating NOTA as a 'fictional candidate' that triggers re-poll, but this is not the rule for Lok Sabha or state assembly elections.",
+      "keywords": ["nota repoll", "nota wins", "re-election", "fresh poll", "none of the above", "myth"]
+    },
+    {
+      "id": "misinformation-counting-fraud",
+      "category": "misinformation",
+      "title": "Myth: Election Commission can change results during counting",
+      "content": "Vote counting in India happens in the presence of counting agents nominated by every contesting candidate, who watch each EVM Control Unit's totals being read out and recorded. Returning Officers cannot unilaterally alter the tabulated count, and the entire process is observed by ECI-appointed observers from outside the state. Disputes are resolved on the spot or through election petitions in the High Court within 45 days of declaration. The ECI itself has no power to 'override' the count of the EVMs.",
+      "keywords": ["counting fraud", "result changed", "eci manipulation", "returning officer", "fixed result", "myth"]
     }
   ]
 }

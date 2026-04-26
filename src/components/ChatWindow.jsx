@@ -4,7 +4,7 @@ import { sendChatMessage } from '../services/gemini';
 import { translate } from '../services/translate';
 import MessageBubble from './MessageBubble';
 
-export default function ChatWindow({ lang = 'en' }) {
+export default function ChatWindow({ lang = 'en', prefilled = null, onPrefillConsumed }) {
   const [messages, setMessages] = useState([
     {
       role: 'assistant',
@@ -14,22 +14,19 @@ export default function ChatWindow({ lang = 'en' }) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const endRef = useRef(null);
+  const lastConsumedPrefill = useRef(null);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
-  const handleSend = async () => {
-    const trimmed = input.trim();
-    if (!trimmed || loading) return;
-
-    setMessages(prev => [...prev, { role: 'user', content: trimmed }]);
-    setInput('');
+  const sendQuery = async (query) => {
+    setMessages(prev => [...prev, { role: 'user', content: query }]);
     setLoading(true);
 
     try {
       // Translate user input to English if needed
-      const englishQuery = lang === 'en' ? trimmed : await translate(trimmed, 'en');
+      const englishQuery = lang === 'en' ? query : await translate(query, 'en');
       const { answer, sources } = await sendChatMessage(englishQuery);
 
       // Translate response back to user's language
@@ -44,6 +41,25 @@ export default function ChatWindow({ lang = 'en' }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Auto-send when a prefilled question is handed in (e.g. from MigrationHelper).
+  // Guarded against StrictMode double-fire and re-mounts via a ref of the last
+  // value we already consumed.
+  useEffect(() => {
+    if (!prefilled) return;
+    if (lastConsumedPrefill.current === prefilled) return;
+    lastConsumedPrefill.current = prefilled;
+    sendQuery(prefilled);
+    onPrefillConsumed?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [prefilled]);
+
+  const handleSend = async () => {
+    const trimmed = input.trim();
+    if (!trimmed || loading) return;
+    setInput('');
+    await sendQuery(trimmed);
   };
 
   const handleKeyDown = (e) => {

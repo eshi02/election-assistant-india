@@ -24,6 +24,12 @@ describe('findRelevantEntries', () => {
     const results = await findRelevantEntries('vote', 2);
     expect(results.length).toBeLessThanOrEqual(2);
   });
+
+  it('surfaces misinformation entries for EVM-hacking style claims', async () => {
+    const results = await findRelevantEntries('can EVMs be hacked from the internet', 6);
+    const categories = results.map(r => r.category);
+    expect(categories).toContain('misinformation');
+  });
 });
 
 describe('formatAsContext', () => {

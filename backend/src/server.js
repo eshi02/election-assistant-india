@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import { generateAnswer } from './services/gemini.js';
+import { generateAnswer, factCheckClaim } from './services/gemini.js';
 import { sanitizeInput } from './utils/sanitize.js';
 import { translateText } from './services/translate.js';
 import { synthesizeSpeech } from './services/tts.js';
@@ -26,7 +26,12 @@ app.use(express.json({ limit: '1mb' }));
 // CORS — in prod we'll restrict to the Firebase domain
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(s => s.trim())
-  : ['http://localhost:5173'];
+  : [
+      'http://localhost:5173',
+      'http://localhost:5174',
+      'http://localhost:5175',
+      'http://localhost:5176',
+    ];
 
 app.use(cors({
   origin: (origin, cb) => {
@@ -74,6 +79,15 @@ const geocodeLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Fact-check: 15/min (expensive — calls Gemini, longer prompts than chat)
+const factcheckLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many fact-check requests. Please slow down.' },
+});
+
 // Health check (Cloud Run pings this)
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: 'election-assistant-backend' });
@@ -97,6 +111,31 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
     res.json(result);
   } catch (err) {
     console.error('Chat error:', err);
+    res.status(500).json({
+      error: 'Something went wrong. Please try again.',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+    });
+  }
+});
+
+// Fact-check endpoint
+app.post('/api/factcheck', factcheckLimiter, async (req, res) => {
+  try {
+    const { claim } = req.body;
+
+    if (!claim || typeof claim !== 'string') {
+      return res.status(400).json({ error: 'claim is required and must be a string' });
+    }
+
+    const cleanClaim = sanitizeInput(claim);
+    if (!cleanClaim) {
+      return res.status(400).json({ error: 'Claim is empty after sanitization.' });
+    }
+
+    const result = await factCheckClaim(cleanClaim);
+    res.json(result);
+  } catch (err) {
+    console.error('Factcheck error:', err);
     res.status(500).json({
       error: 'Something went wrong. Please try again.',
       details: process.env.NODE_ENV === 'development' ? err.message : undefined,

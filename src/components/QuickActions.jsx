@@ -1,8 +1,10 @@
-import { ClipboardCheck, MapPin, MessageSquare } from 'lucide-react';
+import { ClipboardCheck, MapPin, MessageSquare, ShieldCheck, MapPinned } from 'lucide-react';
 
 export default function QuickActions({ onAction }) {
   const actions = [
     { id: 'eligibility', label: 'Am I eligible?', icon: ClipboardCheck },
+    { id: 'migration', label: 'I moved cities', icon: MapPinned },
+    { id: 'factcheck', label: 'Fact-check a forward', icon: ShieldCheck },
     { id: 'booth', label: 'Find polling booth', icon: MapPin },
     { id: 'chat', label: 'Ask anything', icon: MessageSquare },
   ];
